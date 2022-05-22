@@ -394,6 +394,27 @@ div.wunderbaum {
     }
   }
 
+  /* --- FIXED-COLUMN --- */
+  &.wb-fixed-col {
+    overflow-x: scroll;
+
+    div.wb-header,
+    div.wb-scroll-container {
+      overflow: unset;
+
+      span.wb-col:first-of-type {
+        position: sticky;
+        z-index: 1;
+        background-color: $background-color;
+      }
+    }
+    div.wb-header span.wb-col:first-of-type {
+      background-color: $header-color;
+    }
+
+    // height: calc(100% - #{$header-height});  // didn't work. Using JS instead
+  }
+
   /* --- FILTER --- */
   &.wb-ext-filter-dim,
   &.wb-ext-filter-hide {

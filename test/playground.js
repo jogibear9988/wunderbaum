@@ -36,6 +36,7 @@ const tree = new Wunderbaum({
   // checkbox: false,
   id: "Playground",
   // enabled: false,
+  fixedCol: true,
   debugLevel: 4,
   // header: "Playground",
   columns: [
@@ -47,7 +48,7 @@ const tree = new Wunderbaum({
       classes: "wb-helper-center",
       html: "<input type=checkbox tabindex='-1'>",
     },
-    { title: "Details", id: "details", width: "*", html: "<input type=text tabindex='-1'>" },
+    { title: "Details", id: "details", width: "300px", html: "<input type=text tabindex='-1'>" },
     { title: "Mode", id: "mode", width: "100px" },
     { title: "Date", id: "date", width: "100px", html: "<input type=date tabindex='-1'>" },
   ],

@@ -145,6 +145,14 @@ export interface WunderbaumOptions {
    * Default: 200
    */
   updateThrottleWait?: number;
+  /**
+   * Default: true
+   */
+  enabled?: boolean;
+  /**
+   * Default: false
+   */
+  fixedCol?: boolean;
   // --- KeyNav ---
   /**
    * Default: true

@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2021-2022, Martin Wendt (https://wwWendt.de).
  * https://github.com/mar10/wunderbaum
- * 
+ *
  * Released under the MIT license.
  * @version @VERSION
  * @date @DATE
@@ -151,6 +151,8 @@ export class Wunderbaum {
         columns: null,
         types: null,
         // escapeTitles: true,
+        enabled: true,
+        fixedCol: false,
         showSpinner: false,
         checkbox: true,
         minExpandLevel: 0,
@@ -318,7 +320,7 @@ export class Wunderbaum {
     this._initExtensions();
 
     // --- apply iinitial options
-    ["enabled"].forEach((optName) => {
+    ["enabled", "fixedCol"].forEach((optName) => {
       if (opts[optName] != null) {
         this.setOption(optName, opts[optName]);
       }
@@ -919,6 +921,9 @@ export class Wunderbaum {
         case "enabled":
           this.setEnabled(!!value);
           break;
+        case "fixedCol":
+          this.element.classList.toggle("wb-fixed-col", !!value);
+          break;
         default:
           break;
       }
@@ -1318,9 +1323,8 @@ export class Wunderbaum {
   }
 
   /**
-   * Make sure that this node is scrolled into the viewport.
+   * Make sure that this node is vertically scrolled into the viewport.
    *
-   * @param {boolean | PlainObject} [effects=false] animation options.
    * @param {object} [options=null] {topNode: null, effects: ..., parent: ...}
    *     this node will remain visible in
    *     any case, even if `this` is outside the scroll pane.
@@ -1356,6 +1360,48 @@ export class Wunderbaum {
   }
 
   /**
+   * Make sure that this node is horizontally scrolled into the viewport.
+   *
+   * Used for `fixedCol` mode.
+   *
+   * @param {boolean | PlainObject} [effects=false] animation options.
+   * @param {object} [options=null] {topNode: null, effects: ..., parent: ...}
+   *     this node will remain visible in
+   *     any case, even if `this` is outside the scroll pane.
+   */
+  scrollToHorz(opts: any) {
+    const fixedWidth = this.columns[0]._widthPx;
+    const vpWidth = this.element.clientWidth;
+    const scrollLeft = this.element.scrollLeft;
+    // if (scrollLeft <= 0) {
+    //   return; // Not scrolled horizontally: Nothing to do
+    // }
+    // const MARGIN = 1;
+    const colElem = this.getActiveColElem()!;
+    const colLeft = Number.parseInt(colElem?.style.left, 10);
+    const colRight = colLeft + Number.parseInt(colElem?.style.width, 10);
+    let newLeft = scrollLeft;
+
+    if (colLeft - scrollLeft < fixedWidth) {
+      // The current column is scrolled behind the left fixed column
+      newLeft = colLeft - fixedWidth;
+    } else if (colRight - scrollLeft > vpWidth) {
+      // The current column is scrolled outside the right side
+      newLeft = colRight - vpWidth;
+    }
+    // util.assert(node._rowIdx != null);
+    // const curLeft = this.scrollContainer.scrollLeft;
+    this.log(
+      `scrollToHorz(${this.activeColIdx}): ${colLeft}..${colRight}, fixedOfs=${fixedWidth}, vpWidth=${vpWidth}, curLeft=${scrollLeft} -> ${newLeft}`
+    );
+    // const nodeOfs = node._rowIdx * ROW_HEIGHT;
+    // let newLeft;
+
+    this.element.scrollLeft = newLeft;
+    // this.setModified(ChangeType.vscroll);
+    // }
+  }
+  /**
    * Set column #colIdx to 'active'.
    *
    * This higlights the column header and -cells by adding the `wb-active` class.
@@ -1384,6 +1430,10 @@ export class Wunderbaum {
       for (let colDiv of rowDiv.children) {
         (colDiv as HTMLElement).classList.toggle("wb-active", i++ === colIdx);
       }
+    }
+    // Vertical scroll into view
+    if (this.options.fixedCol) {
+      this.scrollToHorz({});
     }
   }
 
