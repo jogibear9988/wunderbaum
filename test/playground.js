@@ -143,6 +143,9 @@ const tree = new Wunderbaum({
       // );
     }
     for (const col of Object.values(e.colInfosById)) {
+      if (col.id === "*") {
+        continue;
+      }
       switch (col.id) {
         // case "favorite": // checkbox
         // case "mode":

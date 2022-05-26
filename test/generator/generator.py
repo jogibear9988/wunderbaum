@@ -1,12 +1,11 @@
 from nutree.tree import Tree
-import sys
 import json
 
 
 class WbNode:
     def __init__(self, title, *, type=None) -> None:
         self.title = title
-        self.type=type
+        self.type = type
 
     def __repr__(self):
         return f"WbNode<'{self.title}'>"
@@ -53,35 +52,36 @@ if __name__ == "__main__":
         "article": {"icon": "bi bi-book"},
     }
     column_list = [
-            {"title": "Title", "id": "*", "width": "200px"},
-            {
-                "title": "Fav",
-                "id": "favorite",
-                "width": "30px",
-                "classes": "wb-helper-center",
-                "html": "<input type=checkbox tabindex='-1'>",
-            },
-            {
-                "title": "Details",
-                "id": "details",
-                "width": "*",
-                "html": "<input type=text tabindex='-1'>",
-            },
-            {"title": "Mode", "id": "mode", "width": "100px"},
-            {
-                "title": "Date",
-                "id": "date",
-                "width": "100px",
-                "html": "<input type=date tabindex='-1'>",
-            },
-        ]
-    for i in range(20):
+        {"title": "Title", "id": "*", "width": "200px"},
+        {
+            "title": "Fav",
+            "id": "favorite",
+            "width": "30px",
+            "classes": "wb-helper-center",
+            "html": "<input type=checkbox tabindex='-1'>",
+        },
+        {
+            "title": "Details",
+            "id": "details",
+            "width": "300px",
+            "html": "<input type=text tabindex='-1'>",
+        },
+        {"title": "Mode", "id": "mode", "width": "100px"},
+        {
+            "title": "Date",
+            "id": "date",
+            "width": "100px",
+            "html": "<input type=date tabindex='-1'>",
+        },
+    ]
+    for i in range(50):
         i += 1
         column_list.append(
             {
                 "title": f"#{i}",
                 "id": f"state_{i}",
                 "width": "30px",
+                "classes": "wb-helper-center",
                 "html": "<input type=checkbox tabindex='-1'>",
             }
         )
