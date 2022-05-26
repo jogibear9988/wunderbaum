@@ -238,7 +238,7 @@ export class Wunderbaum {
       this.navMode = NavigationMode.cellNav;
     }
 
-    this._updateViewportThrottled = util.addaptiveThrottle(
+    this._updateViewportThrottled = util.adaptiveThrottle(
       this._updateViewport.bind(this),
       {}
     );
