@@ -215,7 +215,7 @@ export class Wunderbaum {
     // --- Evaluate options
     this.columns = opts.columns;
     delete opts.columns;
-    if (!this.columns) {
+    if (!this.columns || !this.columns.length) {
       let defaultName = typeof opts.header === "string" ? opts.header : this.id;
       this.columns = [{ id: "*", title: defaultName, width: "*" }];
     }
@@ -1609,7 +1609,7 @@ export class Wunderbaum {
     if (this.options.fixedCol) {
       // 'position: fixed' requires that the content has the correct size
       const tw = `${totalWidth}px`;
-      this.headerElement!.style.width = tw;
+      this.headerElement ? this.headerElement.style.width = tw : 0;
       this.scrollContainerElement!.style.width = tw;
     }
 
