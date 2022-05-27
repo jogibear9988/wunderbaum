@@ -350,9 +350,14 @@ export class Wunderbaum {
     }, 50);
 
     // --- Bind listeners
-    this.scrollContainerElement.addEventListener("scroll", (e: Event) => {
+    this.element.addEventListener("scroll", (e: Event) => {
+      this.log("scroll", e)
       this.setModified(ChangeType.vscroll);
     });
+    // this.scrollContainerElement.addEventListener("scroll", (e: Event) => {
+    //   this.log("scroll", e)
+    //   this.setModified(ChangeType.vscroll);
+    // });
 
     this.resizeObserver = new ResizeObserver((entries) => {
       this.setModified(ChangeType.vscroll);

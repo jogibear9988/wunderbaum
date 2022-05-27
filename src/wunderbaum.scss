@@ -396,7 +396,7 @@ div.wunderbaum {
 
   /* --- FIXED-COLUMN --- */
   &.wb-fixed-col {
-    overflow-x: scroll;
+    overflow: scroll;
 
     div.wb-header,
     div.wb-scroll-container {
@@ -416,7 +416,10 @@ div.wunderbaum {
       // }
     }
     div.wb-header {
-      // overflow: unset;
+      overflow: unset;
+      position: sticky;
+      top: 0;
+      z-index: 2;
       // overflow-x: scroll;
 
       // TODO: the header does not set .wb-node for the title column
@@ -429,8 +432,9 @@ div.wunderbaum {
       }
     }
     div.wb-scroll-container {
+      overflow: unset;
       // overflow-x: unset;
-      overflow-y: scroll;
+      // overflow-x: hidden;
       position: relative;
       span.wb-col.wb-node {
         position: sticky;
