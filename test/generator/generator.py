@@ -1,22 +1,26 @@
-from nutree.tree import Tree
 import json
+
+from fabulist import Fabulist
+from nutree.tree import Tree
 
 
 class WbNode:
-    def __init__(self, title, *, type=None) -> None:
+    def __init__(self, title, *, data=None) -> None:
         self.title = title
-        self.type = type
+        self.data = data
 
     def __repr__(self):
         return f"WbNode<'{self.title}'>"
 
     @staticmethod
-    def serialize_mapper(node, data):
-        data = {
-            "title": node.data.title,
-            "type": node.data.type,
-        }
-        return data
+    def serialize_mapper(nutree_node, data):
+        wb_node = nutree_node.data
+        res = {"title": wb_node.title}
+        res.update(wb_node.data)
+        return res
+
+
+fab = Fabulist()
 
 
 def make_tree(*, spec_list, parent=None, prefix=""):
@@ -24,13 +28,21 @@ def make_tree(*, spec_list, parent=None, prefix=""):
         parent = Tree()
 
     spec_list = spec_list.copy()
-    spec = spec_list.pop(0)
-    for i in range(spec["count"]):
+    spec = spec_list.pop(0).copy()
+    count = spec.pop("count")
+    title = spec.pop("title")
+
+
+    for i in range(count):
         i += 1  # 1-based
         p = f"{prefix}.{i}" if prefix else f"{i}"
+        if "$(" in title:
+            t = fab.get_quote(title)
+        else:
+            t = title
         wb_node = WbNode(
-            spec["title"].format(i=i, prefix=p),
-            type=spec["type"],
+            t.format(i=i, prefix=p),
+            data=spec,
         )
         node = parent.add(wb_node)
         if spec_list:
@@ -38,11 +50,12 @@ def make_tree(*, spec_list, parent=None, prefix=""):
     return parent
 
 
-if __name__ == "__main__":
+def create_fixed_multicheckbox():
     tree = make_tree(
         spec_list=[
-            {"count": 10, "title": "Node {i}", "type": "folder"},
-            {"count": 10, "title": "Node {prefix}", "type": "article"},
+            {"count": 10, "title": "Node {i}", "type": "folder", "expanded": True},
+            {"count": 10, "title": "Node {prefix}", "type": "location"},
+            {"count": 10, "title": "$(name)", "type": "article"},
         ]
     )
     tree.print()
@@ -90,6 +103,10 @@ if __name__ == "__main__":
         "types": type_dict,
         "children": child_list,
     }
+    return wb_data
 
+
+if __name__ == "__main__":
+    res = create_fixed_multicheckbox()
     with open("fixture.json", "wt") as fp:
-        json.dump(wb_data, fp)
+        json.dump(res, fp)

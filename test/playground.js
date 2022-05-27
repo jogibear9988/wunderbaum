@@ -36,7 +36,7 @@ const tree = new Wunderbaum({
   // checkbox: false,
   id: "Playground",
   // enabled: false,
-  fixedCol: true,
+  // fixedCol: true,
   debugLevel: 4,
   // header: "Playground",
   columns: [
@@ -139,9 +139,9 @@ const tree = new Wunderbaum({
     if (e.isNew) {
       // Most columns are automatically handled using the `tree.columns.ID.html`
       // setting, but here we do it explicitly:
-      // e.colInfosById["mode"].elem.appendChild(
-      //   elementFromHtml(ModeElemTemplate)
-      // );
+      e.colInfosById["mode"].elem.appendChild(
+        elementFromHtml(ModeElemTemplate)
+      );
     }
     for (const col of Object.values(e.colInfosById)) {
       if (col.id === "*") {

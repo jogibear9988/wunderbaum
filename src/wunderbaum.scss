@@ -400,19 +400,53 @@ div.wunderbaum {
 
     div.wb-header,
     div.wb-scroll-container {
-      overflow: unset;
+      // overflow: unset;
 
+      // 'position: fixed' requires that the content has the correct size
+      // so we need to set the width of header and scroll-container
+      // via JS as well (when opts.fixedCol=true)
+      // width: max-content;
+
+      // span.wb-col.wb-node {
+      //   position: sticky;
+      //   top: auto;
+      //   left: 0;
+      //   z-index: 1;
+      //   background-color: $background-color;
+      // }
+    }
+    div.wb-header {
+      // overflow: unset;
+      // overflow-x: scroll;
+
+      // TODO: the header does not set .wb-node for the title column
       span.wb-col:first-of-type {
         position: sticky;
+        // top: 0;
+        left: 0;
         z-index: 1;
         background-color: $background-color;
       }
     }
+    div.wb-scroll-container {
+      // overflow-x: unset;
+      overflow-y: scroll;
+      position: relative;
+      span.wb-col.wb-node {
+        position: sticky;
+        // top: auto;
+        left: 0;
+        z-index: 1;
+        background-color: $background-color;
+      }
+    }
+    div.wb-node-list {
+      // overflow: unset;
+      // overflow-x: scroll;
+    }
     div.wb-header span.wb-col:first-of-type {
       background-color: $header-color;
     }
-
-    // height: calc(100% - #{$header-height});  // didn't work. Using JS instead
   }
 
   /* --- FILTER --- */

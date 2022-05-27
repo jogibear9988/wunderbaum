@@ -77,7 +77,7 @@ export class Wunderbaum {
   /** The `div.wb-header` element if any. */
   public readonly headerElement: HTMLDivElement | null;
   /** The `div.wb-scroll-container` element that contains the `nodeListElement`. */
-  public readonly scrollContainer: HTMLDivElement;
+  public readonly scrollContainerElement: HTMLDivElement;
   /** The `div.wb-node-list` element that contains all visible div.wb-row child elements. */
   public readonly nodeListElement: HTMLDivElement;
 
@@ -220,14 +220,10 @@ export class Wunderbaum {
       this.columns = [{ id: "*", title: defaultName, width: "*" }];
     }
 
-    this.types = opts.types || {};
-    delete opts.types;
-    // Convert `TYPE.classes` to a Set
-    for (let t of Object.values(this.types) as any) {
-      if (t.classes) {
-        t.classes = util.toSet(t.classes);
-      }
+    if (opts.types) {
+      this.setTypes(opts.types, true);
     }
+    delete opts.types;
 
     if (this.columns.length === 1) {
       opts.navigationMode = NavigationModeOption.row;
@@ -303,10 +299,10 @@ export class Wunderbaum {
       <div class="wb-scroll-container">
         <div class="wb-node-list"></div>
       </div>`;
-    this.scrollContainer = this.element.querySelector(
+    this.scrollContainerElement = this.element.querySelector(
       "div.wb-scroll-container"
     ) as HTMLDivElement;
-    this.nodeListElement = this.scrollContainer.querySelector(
+    this.nodeListElement = this.scrollContainerElement.querySelector(
       "div.wb-node-list"
     ) as HTMLDivElement;
     this.headerElement = this.element.querySelector(
@@ -354,7 +350,7 @@ export class Wunderbaum {
     }, 50);
 
     // --- Bind listeners
-    this.scrollContainer.addEventListener("scroll", (e: Event) => {
+    this.scrollContainerElement.addEventListener("scroll", (e: Event) => {
       this.setModified(ChangeType.vscroll);
     });
 
@@ -632,10 +628,10 @@ export class Wunderbaum {
 
     if (complete) {
       topIdx = Math.ceil(
-        (this.scrollContainer.scrollTop - gracePy) / ROW_HEIGHT
+        (this.scrollContainerElement.scrollTop - gracePy) / ROW_HEIGHT
       );
     } else {
-      topIdx = Math.floor(this.scrollContainer.scrollTop / ROW_HEIGHT);
+      topIdx = Math.floor(this.scrollContainerElement.scrollTop / ROW_HEIGHT);
     }
     return this._getNodeByRowIdx(topIdx)!;
   }
@@ -646,13 +642,15 @@ export class Wunderbaum {
     if (complete) {
       bottomIdx =
         Math.floor(
-          (this.scrollContainer.scrollTop + this.scrollContainer.clientHeight) /
+          (this.scrollContainerElement.scrollTop +
+            this.scrollContainerElement.clientHeight) /
             ROW_HEIGHT
         ) - 1;
     } else {
       bottomIdx =
         Math.ceil(
-          (this.scrollContainer.scrollTop + this.scrollContainer.clientHeight) /
+          (this.scrollContainerElement.scrollTop +
+            this.scrollContainerElement.clientHeight) /
             ROW_HEIGHT
         ) - 1;
     }
@@ -1058,7 +1056,9 @@ export class Wunderbaum {
    */
   findRelatedNode(node: WunderbaumNode, where: string, includeHidden = false) {
     let res = null;
-    const pageSize = Math.floor(this.scrollContainer.clientHeight / ROW_HEIGHT);
+    const pageSize = Math.floor(
+      this.scrollContainerElement.clientHeight / ROW_HEIGHT
+    );
 
     switch (where) {
       case "parent":
@@ -1333,8 +1333,8 @@ export class Wunderbaum {
     const MARGIN = 1;
     const node = opts.node || this.getActiveNode();
     util.assert(node._rowIdx != null);
-    const curTop = this.scrollContainer.scrollTop;
-    const height = this.scrollContainer.clientHeight;
+    const curTop = this.scrollContainerElement.scrollTop;
+    const height = this.scrollContainerElement.clientHeight;
     const nodeOfs = node._rowIdx * ROW_HEIGHT;
     let newTop;
 
@@ -1354,7 +1354,7 @@ export class Wunderbaum {
         "scrollTo(" + nodeOfs + "): " + curTop + " => " + newTop,
         height
       );
-      this.scrollContainer.scrollTop = newTop;
+      this.scrollContainerElement.scrollTop = newTop;
       this.setModified(ChangeType.vscroll);
     }
   }
@@ -1538,19 +1538,34 @@ export class Wunderbaum {
   ): WunderbaumNode | null {
     return this.root.setStatus(status, message, details);
   }
-
+  /** Add or redefine node type definitions. */
+  setTypes(types: any, replace = true) {
+    util.assert(util.isPlainObject(types));
+    if (replace) {
+      this.types = types;
+    } else {
+      util.extend(this.types, types);
+    }
+    // Convert `TYPE.classes` to a Set
+    for (let t of Object.values(this.types) as any) {
+      if (t.classes) {
+        t.classes = util.toSet(t.classes);
+      }
+    }
+  }
   /** Update column headers and width. */
   updateColumns(opts?: any) {
     opts = Object.assign({ calculateCols: true, updateRows: true }, opts);
     const minWidth = 4;
     const vpWidth = this.element.clientWidth;
+    let totalWidth = 0;
     let totalWeight = 0;
     let fixedWidth = 0;
 
     let modified = false;
 
     if (opts.calculateCols) {
-      // Gather width requests
+      // Gather width definitions
       this._columnsById = {};
       for (let col of this.columns) {
         this._columnsById[<string>col.id] = col;
@@ -1589,7 +1604,15 @@ export class Wunderbaum {
         col._ofsPx = ofsPx;
         ofsPx += col._widthPx;
       }
+      totalWidth = ofsPx;
     }
+    if (this.options.fixedCol) {
+      // 'position: fixed' requires that the content has the correct size
+      const tw = `${totalWidth}px`;
+      this.headerElement!.style.width = tw;
+      this.scrollContainerElement!.style.width = tw;
+    }
+
     // Every column has now a calculated `_ofsPx` and `_widthPx`
     // this.logInfo("UC", this.columns, vpWidth, this.element.clientWidth, this.element);
     // console.trace();
@@ -1656,7 +1679,7 @@ export class Wunderbaum {
     const newNodesOnly = !this.changeRedrawRequestPending;
     this.changeRedrawRequestPending = false;
 
-    let height = this.scrollContainer.clientHeight;
+    let height = this.scrollContainerElement.clientHeight;
     // We cannot get the height for absolute positioned parent, so look at first col
     // let headerHeight = this.headerElement.clientHeight
     // let headerHeight = this.headerElement.children[0].children[0].clientHeight;
@@ -1665,7 +1688,7 @@ export class Wunderbaum {
 
     if (Math.abs(height - wantHeight) > 1.0) {
       // this.log("resize", height, wantHeight);
-      this.scrollContainer.style.height = wantHeight + "px";
+      this.scrollContainerElement.style.height = wantHeight + "px";
       height = wantHeight;
     }
     // console.profile(`_updateViewport()`)
@@ -1727,9 +1750,9 @@ export class Wunderbaum {
     const newNodesOnly = !!opts.newNodesOnly;
 
     const row_height = ROW_HEIGHT;
-    const vp_height = this.scrollContainer.clientHeight;
+    const vp_height = this.scrollContainerElement.clientHeight;
     const prefetch = RENDER_MAX_PREFETCH;
-    const ofs = this.scrollContainer.scrollTop;
+    const ofs = this.scrollContainerElement.scrollTop;
 
     let startIdx = Math.max(0, ofs / row_height - prefetch);
     startIdx = Math.floor(startIdx);
@@ -1982,17 +2005,11 @@ export class Wunderbaum {
   /**
    * Reload the tree with a new source.
    *
-   * Previous data is cleared.
-   * Pass `options.columns` to define a header (may also be part of `source.columns`).
+   * Previous data is cleared. Note that also column- and type defintions may
+   * be passed with the `source` object.
    */
-  load(source: any, options: any = {}) {
+  load(source: any) {
     this.clear();
-    const columns = options.columns || source.columns;
-    if (columns) {
-      this.columns = options.columns;
-      // this._renderHeaderMarkup();
-      this.updateColumns({ calculateCols: false });
-    }
     return this.root.load(source);
   }
 

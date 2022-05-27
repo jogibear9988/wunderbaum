@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 nutree = "*"
+fabulist = "*"
 
 [dev-packages]
 
