@@ -349,6 +349,7 @@ div.wunderbaum {
         > input[type="week"],
         > select {
           width: 100%;
+          max-height: $row-inner-height;
         }
       }
     }
@@ -400,56 +401,22 @@ div.wunderbaum {
 
     div.wb-header,
     div.wb-scroll-container {
-      // overflow: unset;
-
-      // 'position: fixed' requires that the content has the correct size
-      // so we need to set the width of header and scroll-container
-      // via JS as well (when opts.fixedCol=true)
-      // width: max-content;
-
-      // span.wb-col.wb-node {
-      //   position: sticky;
-      //   top: auto;
-      //   left: 0;
-      //   z-index: 1;
-      //   background-color: $background-color;
-      // }
+      overflow: unset;
+      span.wb-col:first-of-type {
+        position: sticky;
+        left: 0;
+        z-index: 1;
+        background-color: $background-color;
+      }
     }
     div.wb-header {
-      overflow: unset;
       position: sticky;
       top: 0;
       z-index: 2;
-      // overflow-x: scroll;
-
       // TODO: the header does not set .wb-node for the title column
       span.wb-col:first-of-type {
-        position: sticky;
-        // top: 0;
-        left: 0;
-        z-index: 1;
-        background-color: $background-color;
+        background-color: $header-color;
       }
-    }
-    div.wb-scroll-container {
-      overflow: unset;
-      // overflow-x: unset;
-      // overflow-x: hidden;
-      position: relative;
-      span.wb-col.wb-node {
-        position: sticky;
-        // top: auto;
-        left: 0;
-        z-index: 1;
-        background-color: $background-color;
-      }
-    }
-    div.wb-node-list {
-      // overflow: unset;
-      // overflow-x: scroll;
-    }
-    div.wb-header span.wb-col:first-of-type {
-      background-color: $header-color;
     }
   }
 

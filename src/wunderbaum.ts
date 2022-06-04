@@ -309,13 +309,11 @@ export class Wunderbaum {
       "div.wb-header"
     ) as HTMLDivElement;
 
-    if (this.columns.length > 1) {
-      this.element.classList.add("wb-grid");
-    }
+    this.element.classList.toggle("wb-grid", this.columns.length > 1);
 
     this._initExtensions();
 
-    // --- apply iinitial options
+    // --- apply initial options
     ["enabled", "fixedCol"].forEach((optName) => {
       if (opts[optName] != null) {
         this.setOption(optName, opts[optName]);
@@ -1563,11 +1561,16 @@ export class Wunderbaum {
     opts = Object.assign({ calculateCols: true, updateRows: true }, opts);
     const minWidth = 4;
     const vpWidth = this.element.clientWidth;
+
     let totalWidth = 0;
     let totalWeight = 0;
     let fixedWidth = 0;
-
     let modified = false;
+
+    this.element.classList.toggle("wb-grid", this.columns.length > 1);
+    if( this.columns.length <2 ){
+      this.setNavigationMode(NavigationMode.row);
+    }
 
     if (opts.calculateCols) {
       // Gather width definitions

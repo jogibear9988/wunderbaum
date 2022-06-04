@@ -66,24 +66,24 @@ def create_fixed_multicheckbox():
     }
     column_list = [
         {"title": "Title", "id": "*", "width": "200px"},
-        {
-            "title": "Fav",
-            "id": "favorite",
-            "width": "30px",
-            "classes": "wb-helper-center",
-            "html": "<input type=checkbox tabindex='-1'>",
-        },
+        # {
+        #     "title": "Fav",
+        #     "id": "favorite",
+        #     "width": "30px",
+        #     "classes": "wb-helper-center",
+        #     "html": "<input type=checkbox tabindex='-1'>",
+        # },
         {
             "title": "Details",
             "id": "details",
             "width": "300px",
             "html": "<input type=text tabindex='-1'>",
         },
-        {"title": "Mode", "id": "mode", "width": "100px"},
+        {"title": "Mode", "id": "mode", "width": "50px"},
         {
             "title": "Date",
             "id": "date",
-            "width": "100px",
+            "width": "130px",
             "html": "<input type=date tabindex='-1'>",
         },
     ]
