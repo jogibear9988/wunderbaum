@@ -349,7 +349,7 @@ export class Wunderbaum {
 
     // --- Bind listeners
     this.element.addEventListener("scroll", (e: Event) => {
-      this.log("scroll", e)
+      this.log("scroll", e);
       this.setModified(ChangeType.vscroll);
     });
     // this.scrollContainerElement.addEventListener("scroll", (e: Event) => {
@@ -1435,9 +1435,9 @@ export class Wunderbaum {
       }
     }
     // Vertical scroll into view
-    if (this.options.fixedCol) {
-      this.scrollToHorz({});
-    }
+    // if (this.options.fixedCol) {
+    this.scrollToHorz({});
+    // }
   }
 
   /** Set or remove keybaord focus to the tree container. */
@@ -1568,7 +1568,7 @@ export class Wunderbaum {
     let modified = false;
 
     this.element.classList.toggle("wb-grid", this.columns.length > 1);
-    if( this.columns.length <2 ){
+    if (this.columns.length < 2) {
       this.setNavigationMode(NavigationMode.row);
     }
 
@@ -1614,12 +1614,12 @@ export class Wunderbaum {
       }
       totalWidth = ofsPx;
     }
-    if (this.options.fixedCol) {
-      // 'position: fixed' requires that the content has the correct size
-      const tw = `${totalWidth}px`;
-      this.headerElement ? this.headerElement.style.width = tw : 0;
-      this.scrollContainerElement!.style.width = tw;
-    }
+    // if (this.options.fixedCol) {
+    // 'position: fixed' requires that the content has the correct size
+    const tw = `${totalWidth}px`;
+    this.headerElement ? (this.headerElement.style.width = tw) : 0;
+    this.scrollContainerElement!.style.width = tw;
+    // }
 
     // Every column has now a calculated `_ofsPx` and `_widthPx`
     // this.logInfo("UC", this.columns, vpWidth, this.element.clientWidth, this.element);
@@ -1758,9 +1758,9 @@ export class Wunderbaum {
     const newNodesOnly = !!opts.newNodesOnly;
 
     const row_height = ROW_HEIGHT;
-    const vp_height = this.scrollContainerElement.clientHeight;
+    const vp_height = this.element.clientHeight;
     const prefetch = RENDER_MAX_PREFETCH;
-    const ofs = this.scrollContainerElement.scrollTop;
+    const ofs = this.element.scrollTop;
 
     let startIdx = Math.max(0, ofs / row_height - prefetch);
     startIdx = Math.floor(startIdx);

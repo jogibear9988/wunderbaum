@@ -94,6 +94,43 @@ div.wunderbaum {
     // height: calc(100% - #{$header-height});  // didn't work. Using JS instead
   }
 
+  /* --- FIXED-COLUMN --- */
+  // &.wb-fixed-col {
+  overflow: auto;
+
+  div.wb-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    // // TODO: the header does not set .wb-node for the title column
+    // span.wb-col:first-of-type {
+    //   background-color: $header-color;
+    // }
+  }
+
+  div.wb-header,
+  div.wb-scroll-container {
+    overflow: unset;
+  }
+
+  // }
+
+  /* Fixed column must be opaque, i.e. have the bg color set.*/
+  &.wb-fixed-col {
+    div.wb-header {
+      span.wb-col:first-of-type {
+        background-color: $header-color;
+      }
+    }
+
+    span.wb-col:first-of-type {
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      background-color: $background-color;
+    }
+  }
+
   // --- Header and node list ---
   div.wb-row {
     position: absolute;
@@ -197,7 +234,7 @@ div.wunderbaum {
   // --- HEADER ---
 
   div.wb-header {
-    position: relative;
+    position: sticky;
     height: $header-height;
     border-bottom: 1px solid $border-color;
     padding: 0;
@@ -391,31 +428,6 @@ div.wunderbaum {
     &:not(:focus) {
       div.wb-node-list div.wb-row {
         border-bottom-color: grayscale($grid-color);
-      }
-    }
-  }
-
-  /* --- FIXED-COLUMN --- */
-  &.wb-fixed-col {
-    overflow: scroll;
-
-    div.wb-header,
-    div.wb-scroll-container {
-      overflow: unset;
-      span.wb-col:first-of-type {
-        position: sticky;
-        left: 0;
-        z-index: 1;
-        background-color: $background-color;
-      }
-    }
-    div.wb-header {
-      position: sticky;
-      top: 0;
-      z-index: 2;
-      // TODO: the header does not set .wb-node for the title column
-      span.wb-col:first-of-type {
-        background-color: $header-color;
       }
     }
   }
