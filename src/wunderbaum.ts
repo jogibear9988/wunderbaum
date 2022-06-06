@@ -647,14 +647,14 @@ export class Wunderbaum {
         Math.floor(
           (this.scrollContainerElement.scrollTop +
             this.scrollContainerElement.clientHeight) /
-            ROW_HEIGHT
+          ROW_HEIGHT
         ) - 1;
     } else {
       bottomIdx =
         Math.ceil(
           (this.scrollContainerElement.scrollTop +
             this.scrollContainerElement.clientHeight) /
-            ROW_HEIGHT
+          ROW_HEIGHT
         ) - 1;
     }
     bottomIdx = Math.min(bottomIdx, this.count(true) - 1);
@@ -885,7 +885,7 @@ export class Wunderbaum {
    * Return `tree.option.NAME` (also resolving if this is a callback).
    *
    * See also {@link WunderbaumNode.getOption|WunderbaumNode.getOption()}
-   * to consider `node.NAME` setting and `tree.types[node.type].NAME`.
+   * to evaluate `node.NAME` setting and `tree.types[node.type].NAME`.
    *
    * @param name option name (use dot notation to access extension option, e.g.
    * `filter.mode`)
@@ -1559,7 +1559,7 @@ export class Wunderbaum {
   /** Update column headers and width. */
   updateColumns(opts?: any) {
     opts = Object.assign({ calculateCols: true, updateRows: true }, opts);
-    const minWidth = 4;
+    const defaultMinWidth = 4;
     const vpWidth = this.element.clientWidth;
 
     let totalWidth = 0;
@@ -1594,7 +1594,7 @@ export class Wunderbaum {
           }
           fixedWidth += px;
         } else {
-          util.error("Invalid column width: " + cw);
+          util.error(`Invalid column width: ${cw}`);
         }
       }
       // Share remaining space between non-fixed columns
@@ -1602,7 +1602,17 @@ export class Wunderbaum {
       let ofsPx = 0;
 
       for (let col of this.columns) {
+        let minWidth: number;
+
         if (col._weight) {
+          const cmw = col.minWidth;
+          if (typeof cmw === "number") {
+            minWidth = cmw;
+          } else if (typeof cmw === "string" && cmw.endsWith("px")) {
+            minWidth = parseFloat(cmw.slice(0, -2));
+          } else {
+            minWidth = defaultMinWidth;
+          }
           const px = Math.max(minWidth, (restPx * col._weight) / totalWeight);
           if (col._widthPx != px) {
             modified = true;
