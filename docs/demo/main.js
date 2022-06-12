@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     debugLevel: 5,
     // checkbox: false,
     // minExpandLevel: 1,
+    fixedCol: true,
     types: {},
     columns: [
       { id: "*", title: "Product", width: "250px" },
@@ -23,7 +24,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
         width: "80px",
         classes: "wb-helper-end",
       },
-      { id: "details", title: "Details", width: "*" },
+      // In order to test horizontal scrolling, we need a minimal width:
+      { id: "details", title: "Details", width: "*", minWidth: "600px" },
     ],
     dnd: {
       dragStart: (e) => {

@@ -19,6 +19,12 @@ body {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+}
+
+body {
+  /* `<!DOCTYPE html>` switches to standard mode, which would define 
+  100% as content height. We want 100% to interpreted as viewport height: */
+  height: 100%;
   /* prevent scrollbars, which would break `100vh` */
   overflow: hidden;
 }
@@ -54,6 +60,8 @@ div.grid-wrapper section.header {
 div.grid-wrapper main.view {
   grid-column: 2;
   grid-row: 3;
+  /* Needed for fixed columns: embedded tree 100% width should not stretch the grid layout: */
+  overflow: hidden;
 }
 
 div.grid-wrapper section.footer {
@@ -81,7 +89,7 @@ div#demo-tree {
   height: calc(100% - 12px);
   /* Leave some space for the blue focus outline*/
   /* padding: 5px;  */
-}  
+}
 
 div#nav-tree {
   background-color: transparent;
