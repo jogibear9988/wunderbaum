@@ -28,8 +28,8 @@ export interface ColumnDefinition {
   id: string;
   /** Column header (defaults to id) */
   title: string;
-  /** Column width or weight. 
-   * Either an absolut pixel value (e.g. `"50px"`) or a relative weight (e.g. `1`) 
+  /** Column width or weight.
+   * Either an absolute pixel value (e.g. `"50px"`) or a relative weight (e.g. `1`)
    * that is used to calculate the width  inside the remaining available space.
    * Default: `"*"`, which is interpreted as `1`.
    */
