@@ -55,6 +55,7 @@ div.grid-wrapper section.header {
   grid-column: 2;
   grid-row: 2;
   padding: 5px;
+  font-size: 90%;
 }
 
 div.grid-wrapper main.view {
@@ -69,6 +70,7 @@ div.grid-wrapper section.footer {
   grid-column: 2;
   grid-row: 4;
   padding: 5px;
+  font-size: 90%;
 }
 
 div.grid-wrapper div.statbar {
@@ -102,17 +104,65 @@ div.wunderbaum.wb-skeleton.wb-initializing {
   background-repeat: no-repeat;
 }
 
+output.error {
+  color: red;
+}
+
 output.tree-version {
   font-size: 40%;
   font-family: 'Courier New', Courier, monospace;
   font-weight: lighter;
 }
 
-output#parentPath {
+output#parentPath:not(.hidden) {
   font-size: 60%;
   display: block;
   padding: 1px 3px;
   height: 12px;
   /* background-color: #dedede; */
   background-color: whitesmoke;
+}
+
+.hide-on-welcome.hidden {
+  display: none;
+}
+
+hr {
+  margin: 1px 0;
+  border: none;
+  background-color: darkslateblue;
+  height: 1px;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover,
+a:active {
+  text-decoration: underline;
+}
+
+a.neutral,
+a.neutral:hover,
+a.neutral:active {
+  text-decoration: none;
+  color: unset;
+}
+
+button.toggle-button {
+  border: 1px solid whitesmoke;
+  border-radius: 3px;
+  background-color: whitesmoke;
+  color: royalblue;
+  padding: 1px 2px;
+}
+
+button.toggle-button:hover {
+  border-color: royalblue;
+}
+
+button.toggle-button.checked {
+  background-color: royalblue;
+  color: whitesmoke;
 }

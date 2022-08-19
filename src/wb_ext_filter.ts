@@ -36,7 +36,7 @@ export class FilterExtension extends WunderbaumExtension {
       hideExpanders: false, // Hide expanders if all child nodes are hidden by filter
       highlight: true, // Highlight matches by wrapping inside <mark> tags
       leavesOnly: false, // Match end nodes only
-      mode: "hide", // Grayout unmatched nodes (pass "hide" to remove unmatched node instead)
+      mode: "dim", // Grayout unmatched nodes (pass "hide" to remove unmatched node instead)
       noData: true, // Display a 'no data' status node if result is empty
     });
   }
@@ -54,6 +54,17 @@ export class FilterExtension extends WunderbaumExtension {
           this.filterNodes(this.queryInput!.value.trim(), {});
         }, 700)
       );
+    }
+  }
+
+  setPluginOption(name: string, value: any): void {
+    // alert("filter opt=" + name + ", " + value)
+    super.setPluginOption(name, value);
+    switch (name) {
+      case "mode":
+        this.tree.filterMode = value === "hide" ? "hide" : "dim";
+        this.tree.updateFilter();
+        break;
     }
   }
 

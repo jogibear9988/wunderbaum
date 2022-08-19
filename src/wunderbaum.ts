@@ -33,6 +33,7 @@ import {
   ROW_HEIGHT,
   TargetType as NodeRegion,
   ApplyCommandType,
+  SetActiveOptions,
 } from "./common";
 import { WunderbaumNode } from "./wb_node";
 import { Deferred } from "./deferred";
@@ -154,7 +155,7 @@ export class Wunderbaum {
         enabled: true,
         fixedCol: false,
         showSpinner: false,
-        checkbox: true,
+        checkbox: false,
         minExpandLevel: 0,
         updateThrottleWait: 200,
         skeleton: false,
@@ -647,14 +648,14 @@ export class Wunderbaum {
         Math.floor(
           (this.scrollContainerElement.scrollTop +
             this.scrollContainerElement.clientHeight) /
-          ROW_HEIGHT
+            ROW_HEIGHT
         ) - 1;
     } else {
       bottomIdx =
         Math.ceil(
           (this.scrollContainerElement.scrollTop +
             this.scrollContainerElement.clientHeight) /
-          ROW_HEIGHT
+            ROW_HEIGHT
         ) - 1;
     }
     bottomIdx = Math.min(bottomIdx, this.count(true) - 1);
@@ -906,6 +907,7 @@ export class Wunderbaum {
       value = value({ type: "resolve", tree: this });
     }
     // Use value from value options dict, fallback do default
+    // console.info(name, value, opts)
     return value ?? defaultValue;
   }
 
@@ -919,6 +921,9 @@ export class Wunderbaum {
     if (name.indexOf(".") === -1) {
       (this.options as any)[name] = value;
       switch (name) {
+        case "checkbox":
+          this.setModified(ChangeType.any, { removeMarkup: true });
+          break;
         case "enabled":
           this.setEnabled(!!value);
           break;
@@ -1007,6 +1012,18 @@ export class Wunderbaum {
    */
   findFirst(match: string | MatcherType) {
     return this.root.findFirst(match);
+  }
+
+  /**
+   * Find first node that matches condition.
+   *
+   * @param match title string to search for, or a
+   *     callback function that returns `true` if a node is matched.
+   * @see {@link WunderbaumNode.findFirst}
+   *
+   */
+  findKey(key: string): WunderbaumNode | undefined {
+    return this.keyMap.get(key);
   }
 
   /**
@@ -1219,6 +1236,9 @@ export class Wunderbaum {
         parentCol
       );
       res.colIdx = idx;
+    } else if (cl.contains("wb-row")) {
+      // Plain tree
+      res.region = NodeRegion.title;
     } else {
       // Somewhere near the title
       if (event.type !== "mousemove" && !(event instanceof KeyboardEvent)) {
@@ -1441,6 +1461,11 @@ export class Wunderbaum {
   }
 
   /** Set or remove keybaord focus to the tree container. */
+  setActiveNode(key: string, flag: boolean = true, options?: SetActiveOptions) {
+    this.findKey(key)?.setActive(flag, options);
+  }
+
+  /** Set or remove keybaord focus to the tree container. */
   setFocus(flag = true) {
     if (flag) {
       this.element.focus();
@@ -1472,6 +1497,12 @@ export class Wunderbaum {
       options = node;
     }
     const immediate = !!util.getOption(options, "immediate");
+    const removeMarkup = !!util.getOption(options, "removeMarkup");
+    if (removeMarkup) {
+      this.visit((n) => {
+        n.removeMarkup();
+      });
+    }
 
     switch (change) {
       case ChangeType.any:

@@ -12,8 +12,8 @@ $node-text-color: #56534c;
 $bg-highlight-color: #26a0da;
 $header-color: #dedede;
 $background-color: white;
-$alternate-row-color: #fcfcfc;
-$alternate-row-color-even: #f7fcfe;
+$alternate-row-color: #f7f7f7; // #fcfcfc;
+$alternate-row-color-hover: #f3f3f3; //#f7fcfe;
 $focus-border-color: #275dc5;
 
 // derived
@@ -138,7 +138,7 @@ div.wunderbaum {
 
   // --- Node List Only ---
 
-  // Dimm some colors if tree has no focus
+  // Dim some colors if tree has no focus
   &:not(:focus-within),
   &:not(:focus) {
     div.wb-node-list div.wb-row {
@@ -150,6 +150,15 @@ div.wunderbaum {
         &:hover {
           background-color: grayscale($active-hover-color);
         }
+      }
+    }
+  }
+  &.wb-alternate div.wb-node-list {
+    div.wb-row:nth-of-type(even):not(.wb-active):not(.wb-selected) {
+      background-color: $alternate-row-color;
+
+      &:hover {
+        background-color: $alternate-row-color-hover;
       }
     }
   }
@@ -414,12 +423,12 @@ div.wunderbaum {
         background-color: $alternate-row-color;
 
         &:hover {
-          background-color: $alternate-row-color-even;
+          background-color: $alternate-row-color-hover;
         }
       }
     }
 
-    // Dimm some colors if tree has no focus
+    // Dim some colors if tree has no focus
     &:not(:focus-within),
     &:not(:focus) {
       div.wb-node-list div.wb-row {
