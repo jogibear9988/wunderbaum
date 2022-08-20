@@ -9,12 +9,11 @@ document.addEventListener("DOMContentLoaded", (event) => {
     id: "navigation",
     header: "Wunderbaum",
     element: document.querySelector("#nav-tree"),
-    checkbox: false,
+    // checkbox: false,
     minExpandLevel: 2,
     debugLevel: 2,
     types: {
       link: { icon: "bi bi-link-45deg", classes: "wb-helper-link" },
-      // code: { icon: "bi bi-file-code" },
       show: { icon: "bi bi-file-code" },
     },
     source: [
@@ -41,29 +40,25 @@ document.addEventListener("DOMContentLoaded", (event) => {
       },
       {
         title: "Demo",
-        key: "welcome",
         type: "folder",
         expanded: true,
         children: [
-          { title: "Plain", type: "show", key: "plain" },
-          { title: "Treegrid", type: "show", key: "grid" },
-          { title: "Large Grid", type: "show", key: "large", },
-          { title: "Editable", type: "show", key: "editable", },
-          { title: "V-Scroll", type: "show", key: "vscroll", },
+          { title: "Welcome", type: "show", key: "demo-welcome", icon: "bi bi-info-square" },
+          { title: "Minimal", type: "show", key: "demo-minimal" },
+          { title: "Plain", type: "show", key: "demo-plain" },
+          { title: "Treegrid", type: "show", key: "demo-grid" },
+          { title: "Large Grid", type: "show", key: "demo-large", },
+          { title: "Editable", type: "show", key: "demo-editable", },
+          { title: "Fixed Column", type: "show", key: "demo-fixedcol", },
         ],
       },
     ],
     init: (e) => {
-      reconfigureTree(window.location.hash || "welcome");
+      reconfigureTree(window.location.hash || "demo-welcome");
     },
     keydown: (e) => {
       const node = e.tree.getActiveNode();
 
-      // e.tree.logWarn(e.type, e, node);
-      // if (e.eventName === "Enter" && node && node.type === "code") {
-      //   const demoTree = mar10.Wunderbaum.getTree("demo");
-      //   node.data.code(demoTree);
-      // }
       if (e.eventName === "Enter" && node && node.type === "show") {
         window.location.hash = node.key;
       }
@@ -73,11 +68,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
         case "link":
           window.open(e.node.data.href);
           break;
-        // case "code":
-        //   const tree = mar10.Wunderbaum.getTree("demo");
-        //   e.node.data.code(tree);
-        //   break;
-        case "folder":
         case "show":
           window.location.hash = e.node.key;
           break;
@@ -108,39 +98,22 @@ document.addEventListener("DOMContentLoaded", (event) => {
   toggleButtonCreate("#filter-hide", (e, flag) => {
     const tree = mar10.Wunderbaum.getTree("demo");
     tree.setOption("filter.mode", flag ? "hide" : "dim");
-    // tree.filterMode = flag ? "hide" : "dim";
-    // tree.updateFilter();
   })
   toggleButtonCreate("#show-checkboxes", (e, flag) => {
     const tree = mar10.Wunderbaum.getTree("demo");
     tree.setOption("checkbox", !!flag);
   })
-  toggleButtonCreate("#enable-tree", (e, flag) => {
+  toggleButtonCreate("#disable-tree", (e, flag) => {
     const tree = mar10.Wunderbaum.getTree("demo");
-    tree.setOption("enabled", !!flag);
+    tree.setOption("enabled", !flag);
   })
-
-
-  /**
-   * Demo button handlers
-   */
-  document.querySelector("a#expand-all").addEventListener("click", (e) => {
-    e.preventDefault();
+  document.querySelector("#toggle-expand-all").addEventListener("click", (e) => {
     const tree = mar10.Wunderbaum.getTree("demo");
-
-    console.time("expandAll");
-    tree.expandAll().then(() => {
-      console.timeEnd("expandAll");
-    });
+    tree.expandAll(!tree.getFirstChild().isExpanded());
   });
-
-  document.querySelector("a#collapse-all").addEventListener("click", (e) => {
-    e.preventDefault();
+  document.querySelector("#toggle-select-all").addEventListener("click", (e) => {
     const tree = mar10.Wunderbaum.getTree("demo");
-
-    console.time("collapseAll");
-    tree.expandAll(false);
-    console.timeEnd("collapseAll");
+    tree.selectAll(!tree.getFirstChild().isSelected());
   });
 });
 
@@ -168,7 +141,6 @@ function showStatus(tree, options) {
 function toggleButtonCreate(selector, onChange) {
   const buttonElem = document.querySelector(selector);
   buttonElem.classList.add("toggle-button")
-  // buttonElem.classList.toggle("checked", !!checked)
   buttonElem.addEventListener("click", (e) => {
     buttonElem.classList.toggle("checked")
     onChange(e, buttonElem.classList.contains("checked"))
@@ -222,6 +194,7 @@ function loadScript(url, async = true, module = true, type = "text/javascript", 
 function reconfigureTree(tag = null) {
   const navTree = mar10.Wunderbaum.getTree("navigation");
   let demoTree = mar10.Wunderbaum.getTree("demo");
+  const detailsElem = document.getElementById("demo-info");
 
   console.info(`reconfigureTree(${tag}), tree=${demoTree}`, demoTree);
 
@@ -229,19 +202,20 @@ function reconfigureTree(tag = null) {
     tag = window.location.hash;
   }
   tag = tag.replace(/^#/, "")
+  tag = tag || "demo-welcome";
+  const isWelcome = tag === "demo-welcome";
 
-  window.location.hash = tag || "welcome";
+  window.location.hash = tag;
 
-  const detailsElem = document.getElementById("demo-info");
   detailsElem.classList.remove("error");
   detailsElem.innerHTML = `Loading demo '${tag}'&hellip;`;
   document.querySelectorAll(".hide-on-welcome").forEach(elem => {
-    elem.classList.toggle("hidden", tag === "welcome")
+    elem.classList.toggle("hidden", isWelcome)
   });
 
   demoTree?.destroy();
 
-  const url = `./demo-${tag}.js`;
+  const url = `./${tag}.js`;
   navTree.setActiveNode(tag)
 
   loadScript(url).then(() => {

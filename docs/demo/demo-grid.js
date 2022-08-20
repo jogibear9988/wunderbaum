@@ -4,20 +4,16 @@
  * Copyright (c) 2021-2022, Martin Wendt (https://wwWendt.de).
  * https://github.com/mar10/wunderbaum
  */
- document.getElementById("demo-info").innerHTML = `
- A treegrid with 
- <a href="../index.html#/tutorial/tutorial_keyboard">Keyboard Navigation</a> &mdash;
- <a href="../index.html#/tutorial/tutorial_dnd">Drag and Drop</a> &mdash;
- <a href="../index.html#/tutorial/tutorial_select">Select</a> &mdash;
- <a href="../index.html#/tutorial/tutorial_filter">Filter/Search</a> &mdash;
- <a href="../index.html#/tutorial/tutorial_edit">Edit</a>
+document.getElementById("demo-info").innerHTML = `
+ A treegrid with ...
  `;
- 
+
 new mar10.Wunderbaum({
   id: "demo",
   element: document.querySelector("#demo-tree"),
   source: "../assets/ajax-tree-products.json",
   debugLevel: 5,
+  attachBreadcrumb: document.getElementById("parentPath"),
   // checkbox: false,
   // minExpandLevel: 1,
   // fixedCol: true,
@@ -157,10 +153,7 @@ new mar10.Wunderbaum({
     }
   },
   update: function (e) {
-    // console.log(e.type, e);
-    let path = e.tree.getTopmostVpNode(true)?.getPath(false, "title", " > ");
-    path = path ? path + " >" : "";
-    document.getElementById("parentPath").textContent = `${path}`;
+    // Only used for the demo app (display some stats in the bottom pane):
     showStatus(this);
   },
 });

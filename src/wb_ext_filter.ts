@@ -28,6 +28,7 @@ export class FilterExtension extends WunderbaumExtension {
 
   constructor(tree: Wunderbaum) {
     super(tree, "filter", {
+      attachInput: null, // Element or selector of an input control for filter query strings
       autoApply: true, // Re-apply last filter if lazy data is loaded
       autoExpand: false, // Expand all branches that contain matches while filtered
       counter: true, // Show a badge with number of matching child nodes near parent icons
@@ -43,7 +44,7 @@ export class FilterExtension extends WunderbaumExtension {
 
   init() {
     super.init();
-    let attachInput = this.getPluginOption("attachInput");
+    const attachInput = this.getPluginOption("attachInput");
     if (attachInput) {
       this.queryInput = elemFromSelector(attachInput) as HTMLInputElement;
       onEvent(

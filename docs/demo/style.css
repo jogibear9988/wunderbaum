@@ -21,6 +21,10 @@ body {
   margin: 0;
 }
 
+ul {
+  padding: revert;
+}
+
 body {
   /* `<!DOCTYPE html>` switches to standard mode, which would define 
   100% as content height. We want 100% to interpreted as viewport height: */
@@ -104,6 +108,10 @@ div.wunderbaum.wb-skeleton.wb-initializing {
   background-repeat: no-repeat;
 }
 
+div.welcome-page {
+  padding: 4px 4px;
+}
+
 output.error {
   color: red;
 }
@@ -134,6 +142,7 @@ hr {
   height: 1px;
 }
 
+
 a {
   text-decoration: none;
 }
@@ -150,6 +159,7 @@ a.neutral:active {
   color: unset;
 }
 
+button.icon-button,
 button.toggle-button {
   border: 1px solid whitesmoke;
   border-radius: 3px;
@@ -158,6 +168,7 @@ button.toggle-button {
   padding: 1px 2px;
 }
 
+button.icon-button:hover,
 button.toggle-button:hover {
   border-color: royalblue;
 }

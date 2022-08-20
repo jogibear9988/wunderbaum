@@ -6,7 +6,7 @@
  */
 
 document.getElementById("demo-info").innerHTML = `
-A simple tree with drag'n'drop, etc.
+A simple tree with filter, rename, drag'n'drop, lazy-loading.
 `;
 
 /* <a href="../index.html#/tutorial/tutorial_keyboard">Keyboard Navigation</a> &mdash;
@@ -21,6 +21,7 @@ new mar10.Wunderbaum({
   element: document.querySelector("#demo-tree"),
   source: "../assets/ajax-tree-products.json",
   debugLevel: 5,
+  attachBreadcrumb: document.getElementById("parentPath"),
   // checkbox: false,
   // minExpandLevel: 1,
   types: {},
@@ -89,10 +90,7 @@ new mar10.Wunderbaum({
     // console.log(e.type, e.isNew, e);
   },
   update: function (e) {
-    // console.log(e.type, e);
-    let path = e.tree.getTopmostVpNode(true)?.getPath(false, "title", " > ");
-    path = path ? path + " >" : "";
-    document.getElementById("parentPath").textContent = `${path}`;
+    // Only used for the demo app (display some stats in the bottom pane):
     showStatus(this);
   },
 });

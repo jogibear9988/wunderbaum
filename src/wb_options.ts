@@ -163,6 +163,11 @@ export interface WunderbaumOptions {
    */
   autoCollapse?: boolean;
   /**
+   * HTMLElement that receives the top nodes breadcrumb.
+   * Default: undefined
+   */
+  attachBreadcrumb?: HTMLElement;
+  /**
    * Default:  NavigationModeOption.startRow
    */
   navigationMode?: NavigationModeOption;
@@ -190,17 +195,21 @@ export interface WunderbaumOptions {
    * Default: false
    */
   fixedCol?: boolean;
+
   // --- KeyNav ---
   /**
    * Default: true
    */
   quicksearch?: boolean;
 
-  // --- Extensions ---
+  // --- Extensions ------------------------------------------------------------
   dnd?: DndOptionsType; // = {};
+  edit: any; // = {};
   filter: any; // = {};
   grid: any; // = {};
-  // --- Events ---
+
+  // --- Events ----------------------------------------------------------------
+
   /**
    *
    * @category Callback

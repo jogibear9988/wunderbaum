@@ -159,6 +159,7 @@ export class Wunderbaum {
         minExpandLevel: 0,
         updateThrottleWait: 200,
         skeleton: false,
+        attachBreadcrumb: null, // HTMLElement that receives the top nodes breadcrumb
         // --- KeyNav ---
         navigationMode: NavigationModeOption.startRow,
         quicksearch: true,
@@ -627,35 +628,32 @@ export class Wunderbaum {
 
   /** Return the topmost visible node in the viewport. */
   getTopmostVpNode(complete = true) {
-    let topIdx: number;
     const gracePy = 1; // ignore subpixel scrolling
+    const scrollParent = this.element;
+    let topIdx: number;
 
     if (complete) {
-      topIdx = Math.ceil(
-        (this.scrollContainerElement.scrollTop - gracePy) / ROW_HEIGHT
-      );
+      topIdx = Math.ceil((scrollParent.scrollTop - gracePy) / ROW_HEIGHT);
     } else {
-      topIdx = Math.floor(this.scrollContainerElement.scrollTop / ROW_HEIGHT);
+      topIdx = Math.floor(scrollParent.scrollTop / ROW_HEIGHT);
     }
     return this._getNodeByRowIdx(topIdx)!;
   }
 
   /** Return the lowest visible node in the viewport. */
   getLowestVpNode(complete = true) {
+    const scrollParent = this.element;
     let bottomIdx: number;
+
     if (complete) {
       bottomIdx =
         Math.floor(
-          (this.scrollContainerElement.scrollTop +
-            this.scrollContainerElement.clientHeight) /
-            ROW_HEIGHT
+          (scrollParent.scrollTop + scrollParent.clientHeight) / ROW_HEIGHT
         ) - 1;
     } else {
       bottomIdx =
         Math.ceil(
-          (this.scrollContainerElement.scrollTop +
-            this.scrollContainerElement.clientHeight) /
-            ROW_HEIGHT
+          (scrollParent.scrollTop + scrollParent.clientHeight) / ROW_HEIGHT
         ) - 1;
     }
     bottomIdx = Math.min(bottomIdx, this.count(true) - 1);
@@ -917,7 +915,7 @@ export class Wunderbaum {
    * @param value
    */
   setOption(name: string, value: any): void {
-    this.log(`setOption(${name}, ${value})`);
+    // this.log(`setOption(${name}, ${value})`);
     if (name.indexOf(".") === -1) {
       (this.options as any)[name] = value;
       switch (name) {
@@ -966,6 +964,18 @@ export class Wunderbaum {
     } finally {
       this.enableUpdate(true);
       this.logTimeEnd(tag);
+    }
+  }
+
+  /** Recursively select all nodes. */
+  selectAll(flag: boolean = true) {
+    try {
+      this.enableUpdate(false);
+      this.visit((node) => {
+        node.setSelected(flag);
+      });
+    } finally {
+      this.enableUpdate(true);
     }
   }
 
@@ -1748,6 +1758,12 @@ export class Wunderbaum {
 
     // console.profileEnd(`_updateViewport()`)
 
+    if (this.options.attachBreadcrumb) {
+      let path = this.getTopmostVpNode(true)?.getPath(false, "title", " > ");
+      path = path ? path + " >" : "";
+      console.log("attachBreadcrumb: " + path);
+      this.options.attachBreadcrumb.textContent = `${path}`;
+    }
     this._callEvent("update");
   }
 
@@ -2094,6 +2110,7 @@ export class Wunderbaum {
       //   `enableUpdate(${flag}): count -> ${this._disableUpdateCount}...`
       // );
       if (this._disableUpdateCount === 0) {
+        this.changeRedrawRequestPending = true; // make sure, we re-render all markup
         this.updateViewport();
       }
     } else {

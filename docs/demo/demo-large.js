@@ -4,16 +4,17 @@
  * Copyright (c) 2021-2022, Martin Wendt (https://wwWendt.de).
  * https://github.com/mar10/wunderbaum
  */
- document.getElementById("demo-info").innerHTML = `
- A treegrid with ~100,000 nodes.
+document.getElementById("demo-info").innerHTML = `
+ A treegrid with about 100,000 nodes.
  `;
- 
+
 new mar10.Wunderbaum({
   id: "demo",
   element: document.querySelector("#demo-tree"),
   source:
     "https://cdn.jsdelivr.net/gh/mar10/assets@master/fancytree/ajax_101k.json",
   debugLevel: 5,
+  attachBreadcrumb: document.getElementById("parentPath"),
   // checkbox: false,
   // minExpandLevel: 1,
   // fixedCol: true,
@@ -153,10 +154,7 @@ new mar10.Wunderbaum({
     }
   },
   update: function (e) {
-    // console.log(e.type, e);
-    let path = e.tree.getTopmostVpNode(true)?.getPath(false, "title", " > ");
-    path = path ? path + " >" : "";
-    document.getElementById("parentPath").textContent = `${path}`;
+    // Only used for the demo app (display some stats in the bottom pane):
     showStatus(this);
   },
 });
