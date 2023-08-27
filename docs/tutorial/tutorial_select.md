@@ -7,6 +7,7 @@
 ```js
 const tree = new Wunderbaum({
   // --- Common Options ---
+  selectMode: "multi",
   ...
 });
 ```

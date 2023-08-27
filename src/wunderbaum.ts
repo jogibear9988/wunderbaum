@@ -46,6 +46,7 @@ import {
   SortCallback,
   NodeToDictCallback,
   WbNodeData,
+  SelectModeType,
 } from "./types";
 import {
   DEFAULT_DEBUGLEVEL,
@@ -134,6 +135,9 @@ export class Wunderbaum {
   /** Expose some useful methods of the util.ts module as `tree._util`. */
   public _util = util;
 
+  // --- SELECT ---
+  public selectMode: SelectModeType = "multi";
+
   // --- FILTER ---
   public filterMode: FilterModeType = null;
 
@@ -146,6 +150,8 @@ export class Wunderbaum {
   public lastQuicksearchTime = 0;
   /** @internal */
   public lastQuicksearchTerm = "";
+  /** @internal */
+  public selectRangeAnchor: WunderbaumNode | null = null;
 
   // --- EDIT ---
   protected lastClickTime = 0;
@@ -380,7 +386,15 @@ export class Wunderbaum {
     util.onEvent(this.nodeListElement, "click", "div.wb-row", (e) => {
       const info = Wunderbaum.getEventInfo(e);
       const node = info.node;
+      const mouseEvent = e as MouseEvent;
+
       // this.log("click", info, e);
+      if (mouseEvent.shiftKey && this.selectRangeAnchor && node) {
+        // this.selec
+        util.error("Not implemented: range selection");
+      } else {
+        this.selectRangeAnchor = node;
+      }
 
       if (
         this._callEvent("click", { event: e, node: node, info: info }) === false
@@ -389,6 +403,10 @@ export class Wunderbaum {
         return false;
       }
       if (node) {
+        if (mouseEvent.ctrlKey) {
+          node.toggleSelected();
+          return;
+        }
         // Edit title if 'clickActive' is triggered:
         const trigger = this.getOption("edit.trigger");
         const slowClickDelay = this.getOption("edit.slowClickDelay");
@@ -1010,8 +1028,15 @@ export class Wunderbaum {
     return this.isGrid() ? header !== false : !!header;
   }
 
-  /** Run code, but defer rendering of viewport until done. */
-  runWithoutUpdate(func: () => any, hint = null): void {
+  /** Run code, but defer rendering of viewport until done.
+   *
+   * ```
+   * tree.runWithDeferredUpdate(() => {
+   *   return someFuncThatWouldUpdateManyNodes();
+   * });
+   * ```
+   */
+  runWithDeferredUpdate(func: () => any, hint = null): void {
     try {
       this.enableUpdate(false);
       const res = func();
@@ -1029,14 +1054,19 @@ export class Wunderbaum {
 
   /** Recursively select all nodes. */
   selectAll(flag: boolean = true) {
-    try {
-      this.enableUpdate(false);
+    this.runWithDeferredUpdate(() => {
       this.visit((node) => {
         node.setSelected(flag);
       });
-    } finally {
-      this.enableUpdate(true);
-    }
+    });
+  }
+
+  /**
+   * Return an array of selected nodes.
+   * @param stopOnParents only return the topmost selected node (useful with selectMode 'hier')
+   */
+  getSelectedNodes(stopOnParents: boolean = false): WunderbaumNode[] {
+    return this.root.getSelectedNodes(stopOnParents);
   }
 
   /** Return the number of nodes in the data model.*/
@@ -1306,6 +1336,7 @@ export class Wunderbaum {
       node = Wunderbaum.getNode(target),
       tree = node ? node.tree : Wunderbaum.getTree(event),
       res: WbEventInfo = {
+        canonicalName: util.eventToString(event),
         tree: tree!,
         node: node,
         region: NodeRegion.unknown,

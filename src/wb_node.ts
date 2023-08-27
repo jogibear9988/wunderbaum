@@ -55,6 +55,7 @@ const NODE_PROPS = new Set<string>([
   "icon",
   "key",
   "lazy",
+  "radiogroup",
   "refKey",
   "selected",
   "title",
@@ -111,6 +112,7 @@ export class WunderbaumNode {
   public readonly refKey: string | undefined = undefined;
   public children: WunderbaumNode[] | null = null;
   public checkbox?: boolean;
+  public radiogroup?: boolean;
   /** If true, (in grid mode) no cells are rendered, except for the node title.*/
   public colspan?: boolean;
   public icon?: boolean | string;
@@ -160,6 +162,7 @@ export class WunderbaumNode {
       : 0;
     data.type != null ? (this.type = "" + data.type) : 0;
     data.checkbox != null ? (this.checkbox = !!data.checkbox) : 0;
+    data.radiogroup != null ? (this.radiogroup = !!data.radiogroup) : 0;
     data.colspan != null ? (this.colspan = !!data.colspan) : 0;
     this.expanded = data.expanded === true;
     data.icon != null ? (this.icon = data.icon) : 0;
@@ -1514,7 +1517,8 @@ export class WunderbaumNode {
   protected _render_markup(opts: RenderOptions) {
     const tree = this.tree;
     const treeOptions = tree.options;
-    const checkbox = this.getOption("checkbox") !== false;
+    const checkbox = this.getOption("checkbox");
+    // const checkbox = this.getOption("checkbox") !== false;
     const columns = tree.columns;
     const level = this.getLevel();
     let elem: HTMLElement;
@@ -1553,6 +1557,9 @@ export class WunderbaumNode {
     if (checkbox) {
       checkboxSpan = document.createElement("i");
       checkboxSpan.classList.add("wb-checkbox");
+      if (checkbox === "radio" || this.parent.radiogroup) {
+        checkboxSpan.classList.add("wb-radio");
+      }
       nodeElem.appendChild(checkboxSpan);
       ofsTitlePx += ICON_WIDTH;
     }
@@ -1779,10 +1786,20 @@ export class WunderbaumNode {
       }
     }
     if (checkboxSpan) {
-      if (this.selected) {
-        checkboxSpan.className = "wb-checkbox " + iconMap.checkChecked;
+      if (this.parent.radiogroup) {
+        if (this.selected) {
+          checkboxSpan.className =
+            "wb-checkbox wb-radio " + iconMap.radioChecked;
+        } else {
+          checkboxSpan.className =
+            "wb-checkbox wb-radio " + iconMap.radioUnchecked;
+        }
       } else {
-        checkboxSpan.className = "wb-checkbox " + iconMap.checkUnchecked;
+        if (this.selected) {
+          checkboxSpan.className = "wb-checkbox " + iconMap.checkChecked;
+        } else {
+          checkboxSpan.className = "wb-checkbox " + iconMap.checkUnchecked;
+        }
       }
     }
     // Fix active cell in cell-nav mode
@@ -2120,14 +2137,139 @@ export class WunderbaumNode {
     this.tree.update(change, this);
   }
 
+  /**
+   * Return an array of selected nodes.
+   * @param stopOnParents only return the topmost selected node (useful with selectMode 'hier')
+   */
+  getSelectedNodes(stopOnParents: boolean = false): WunderbaumNode[] {
+    let nodeList: WunderbaumNode[] = [];
+    this.visit(function (node) {
+      if (node.selected) {
+        nodeList.push(node);
+        if (stopOnParents === true) {
+          return "skip"; // stop processing this branch
+        }
+      }
+    });
+    return nodeList;
+  }
+
+  /** Toggle the check/uncheck state. */
+  toggleSelected(options?: SetSelectedOptions): boolean {
+    return this.setSelected(!this.selected, options);
+  }
+
   /** Modify the check/uncheck state. */
-  setSelected(flag: boolean = true, options?: SetSelectedOptions) {
-    const prev = this.selected;
-    if (!!flag !== prev) {
+  setSelected(flag: boolean = true, options?: SetSelectedOptions): boolean {
+    const tree = this.tree;
+    const sendEvents = !options?.noEvents; // Default: send events
+    const prev = !!this.selected;
+
+    flag = !!flag;
+
+    if (options?.propagateDown) {
+      tree.runWithDeferredUpdate(() => {
+        this.visit((node) => {
+          node.setSelected(flag);
+        });
+      });
+      return prev;
+    }
+
+    if (
+      flag === prev ||
+      (sendEvents && this._callEvent("beforeSelect", { flag: flag }) === false)
+    ) {
+      return prev;
+    }
+
+    tree.runWithDeferredUpdate(() => {
+      if (this.parent.radiogroup && flag) {
+        for (let sibling of this.parent.children!) {
+          sibling.selected = sibling === this;
+        }
+      } else {
+        this.selected = flag;
+      }
+    });
+
+    if (sendEvents) {
       this._callEvent("select", { flag: flag });
     }
-    this.selected = !!flag;
-    this.update();
+
+    /*
+        callOpts = callOpts || {};
+        var node = ctx.node,
+          tree = ctx.tree,
+          opts = ctx.options,
+          noEvents = callOpts.noEvents === true,
+          parent = node.parent;
+
+        // flag defaults to true
+        flag = flag !== false;
+
+        // node.debug("nodeSetSelected(" + flag + ")", ctx);
+
+        // Cannot (de)select unselectable nodes directly (only by propagation or
+        // by setting the `.selected` property)
+        if (FT.evalOption("unselectable", node, node, opts, false)) {
+          return;
+        }
+
+        // Remember the user's intent, in case down -> up propagation prevents
+        // applying it to node.selected
+        node._lastSelectIntent = flag; // Confusing use of '!'
+
+        // Nothing to do?
+        if (!!node.selected === flag) {
+          if (opts.selectMode === 3 && node.partsel && !flag) {
+            // If propagation prevented selecting this node last time, we still
+            // want to allow to apply setSelected(false) now
+          } else {
+            return flag;
+          }
+        }
+
+        if (
+          !noEvents &&
+          this._triggerNodeEvent(
+            "beforeSelect",
+            node,
+            ctx.originalEvent
+          ) === false
+        ) {
+          return !!node.selected;
+        }
+        if (flag && opts.selectMode === 1) {
+          // single selection mode (we don't uncheck all tree nodes, for performance reasons)
+          if (tree.lastSelectedNode) {
+            tree.lastSelectedNode.setSelected(false);
+          }
+          node.selected = flag;
+        } else if (
+          opts.selectMode === 3 &&
+          parent &&
+          !parent.radiogroup &&
+          !node.radiogroup
+        ) {
+          // multi-hierarchical selection mode
+          node.selected = flag;
+          node.fixSelection3AfterClick(callOpts);
+        } else if (parent && parent.radiogroup) {
+          node.visitSiblings(function (n) {
+            n._changeSelectStatusAttrs(flag && n === node);
+          }, true);
+        } else {
+          // default: selectMode: 2, multi selection mode
+          node.selected = flag;
+        }
+        this.nodeRenderStatus(ctx);
+        tree.lastSelectedNode = flag ? node : null;
+        if (!noEvents) {
+          tree._triggerNodeEvent("select", ctx);
+        }
+    */
+    return prev;
   }
 
   /** Display node status (ok, loading, error, noData) using styles and a dummy child node. */

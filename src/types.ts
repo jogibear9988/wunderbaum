@@ -120,8 +120,6 @@ export interface WbKeydownEventType extends WbTreeEventType {
   event: KeyboardEvent;
   node: WunderbaumNode;
   info: WbEventInfo;
-  /** Canical name of the key including modifiers. @see {@link util.eventToString} */
-  eventName: string;
 }
 
 export interface WbInitEventType extends WbTreeEventType {
@@ -247,6 +245,10 @@ export type ColumnEventInfoMap = { [colId: string]: ColumnEventInfo };
  * @see {@link Wunderbaum.getEventInfo}
  */
 export interface WbEventInfo {
+  /** Canonical descriptive string of the event type including modifiers,
+   * e.g. `Ctrl+Down`. @see {@link util.eventToString}
+   */
+  canonicalName: string;
   /** The tree instance. */
   tree: Wunderbaum;
   /** The affected node instance instance if any. */
@@ -268,6 +270,7 @@ export interface WbEventInfo {
 // export type WbRenderCallbackType = (e: WbRenderEventType) => void;
 
 export type FilterModeType = null | "dim" | "hide";
+export type SelectModeType = "single" | "multi" | "hier";
 export type ApplyCommandType =
   | "addChild"
   | "addSibling"
@@ -493,8 +496,14 @@ export interface UpdateOptions {
 export interface SetSelectedOptions {
   /** Ignore restrictions. @default false */
   force?: boolean;
-  /** Do not send events. @default false */
+  /** Do not send `beforeSelect` or `select` events. @default false */
   noEvents?: boolean;
+  /** Apply to all descendant nodes. @default false */
+  propagateDown: null;
+  /** Apply to all ancestor nodes. @default false */
+  propagateUp: null;
+  /** Called for every node. May return false to prevent action. @default null */
+  callback: null;
 }
 
 /** Possible values for {@link WunderbaumNode.setStatus()} `options` argument. */

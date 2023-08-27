@@ -7,6 +7,8 @@ First release.
 > This section will be removed after the beta phase. <br>
 > Note that semantic versioning rules are not strictly followed during this phase.
 
+- v0.4.0: Add support for multi-select and radio-groups
+
 - v0.3.6: Remove import of wunderbaum.scss into TS modules
 - v0.3.6: Renamed `setModified()` to `update()`
 - v0.3.6: Removed `node.render()`: use `node.update()` instead

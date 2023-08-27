@@ -46,6 +46,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
           { title: "Welcome", type: "show", key: "demo-welcome", icon: "bi bi-info-square" },
           { title: "Minimal", type: "show", key: "demo-minimal" },
           { title: "Plain", type: "show", key: "demo-plain" },
+          { title: "Select", type: "show", key: "demo-select", },
           { title: "Treegrid", type: "show", key: "demo-grid" },
           { title: "Large Grid", type: "show", key: "demo-large", },
           { title: "Readonly", type: "show", key: "demo-readonly", },
