@@ -8,6 +8,9 @@ import { WunderbaumNode } from "./wb_node";
 import { Wunderbaum } from "./wunderbaum";
 import { WunderbaumOptions } from "./wb_options";
 
+/** A value that can either be true, false, or undefined. */
+export type TristateType = boolean | undefined;
+
 /** Passed to `find...()` methods. Should return true if node matches. */
 export type MatcherCallback = (node: WunderbaumNode) => boolean;
 /** Passed to `sortChildren()` methods. Should return -1, 0, or 1. */

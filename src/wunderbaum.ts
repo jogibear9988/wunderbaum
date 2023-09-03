@@ -46,7 +46,6 @@ import {
   SortCallback,
   NodeToDictCallback,
   WbNodeData,
-  SelectModeType,
 } from "./types";
 import {
   DEFAULT_DEBUGLEVEL,
@@ -136,7 +135,8 @@ export class Wunderbaum {
   public _util = util;
 
   // --- SELECT ---
-  public selectMode: SelectModeType = "multi";
+  /** @internal */
+  public selectRangeAnchor: WunderbaumNode | null = null;
 
   // --- FILTER ---
   public filterMode: FilterModeType = null;
@@ -150,8 +150,6 @@ export class Wunderbaum {
   public lastQuicksearchTime = 0;
   /** @internal */
   public lastQuicksearchTerm = "";
-  /** @internal */
-  public selectRangeAnchor: WunderbaumNode | null = null;
 
   // --- EDIT ---
   protected lastClickTime = 0;
@@ -178,6 +176,7 @@ export class Wunderbaum {
         // updateThrottleWait: 200,
         skeleton: false,
         connectTopBreadcrumb: null, // HTMLElement that receives the top nodes breadcrumb
+        selectMode: "multi", // SelectModeType
         // --- KeyNav ---
         navigationModeOption: null, // NavModeEnum.startRow,
         quicksearch: true,
@@ -428,7 +427,7 @@ export class Wunderbaum {
         if (info.region === NodeRegion.expander) {
           node.setExpanded(!node.isExpanded());
         } else if (info.region === NodeRegion.checkbox) {
-          node.setSelected(!node.isSelected());
+          node.toggleSelected();
         }
       }
       this.lastClickTime = Date.now();
@@ -1047,18 +1046,27 @@ export class Wunderbaum {
     }
   }
 
-  /** Recursively expand all expandable nodes (triggers lazy load id needed). */
+  /** Recursively expand all expandable nodes (triggers lazy load if needed). */
   async expandAll(flag: boolean = true, options?: ExpandAllOptions) {
     await this.root.expandAll(flag, options);
   }
 
   /** Recursively select all nodes. */
   selectAll(flag: boolean = true) {
-    this.runWithDeferredUpdate(() => {
-      this.visit((node) => {
-        node.setSelected(flag);
-      });
-    });
+    return this.root.setSelected(flag);
+    // this.runWithDeferredUpdate(() => {
+    //   this.visit((node) => {
+    //     if (node.parent.radiogroup) {
+    //       return "skip";
+    //     }
+    //     node.setSelected(flag);
+    //   });
+    // });
+  }
+
+  /** Recursively select all nodes. */
+  toggleSelect() {
+    this.selectAll(this.root._anySelectable());
   }
 
   /**
@@ -1073,7 +1081,6 @@ export class Wunderbaum {
   count(visible = false): number {
     if (visible) {
       return this.treeRowCount;
-      // return this.viewNodes.size;
     }
     return this.keyMap.size;
   }
@@ -1182,7 +1189,7 @@ export class Wunderbaum {
         break;
       case "first":
         // First visible node
-        this.visit(function (n) {
+        this.visit((n) => {
           if (n.isVisible()) {
             res = n;
             return false;
@@ -1190,7 +1197,7 @@ export class Wunderbaum {
         });
         break;
       case "last":
-        this.visit(function (n) {
+        this.visit((n) => {
           // last visible node
           if (n.isVisible()) {
             res = n;
@@ -2273,7 +2280,7 @@ export class Wunderbaum {
           node.children.length &&
           (includeHidden || node.expanded)
         ) {
-          res = node.visit(function (n: WunderbaumNode) {
+          res = node.visit((n: WunderbaumNode) => {
             if (n === stopNode) {
               return false;
             }

@@ -16,63 +16,65 @@ new mar10.Wunderbaum({
   selectMode: "hier",
   source: [
     {
-      title: "n1", expanded: true, children: [
-        { title: "n1.1 (selected)" },
-        { title: "n1.2" },
-        { title: "n1.3" }
-      ]
+      title: "n1",
+      expanded: true,
+      children: [{ title: "n1.1" }, { title: "n1.2" }, { title: "n1.3" }],
     },
     {
-      title: "n2", expanded: true, children: [
+      title: "n2",
+      expanded: true,
+      children: [
         { title: "n2.1 (selected)", selected: true },
         { title: "n2.2", selected: false },
-        { title: "n2.3", selected: null }
-      ]
+        { title: "n2.3", selected: null },
+      ],
     },
     {
-      title: "n3", expanded: true, children: [
+      title: "n3",
+      expanded: true,
+      children: [
         {
-          title: "n3.1", expanded: true, children: [
+          title: "n3.1",
+          expanded: true,
+          children: [
             { title: "n3.1.1 (unselectable)", unselectable: true },
             { title: "n3.1.2 (unselectable)", unselectable: true },
-            { title: "n3.1.3" }
-          ]
+            { title: "n3.1.3" },
+          ],
         },
         {
-          title: "n3.2", expanded: true, children: [
-            { title: "n3.2.1 (unselectableStatus: true)", unselectableStatus: true },
-            { title: "n3.2.2 (unselectableStatus: false)", unselectableStatus: false },
-            { title: "n3.2.3" }
-          ]
+          title: "n3.3",
+          expanded: true,
+          children: [
+            { title: "n3.2.1 (unselectable)", unselectable: true },
+            {
+              title: "n3.2.2 (unselectable, selected)",
+              unselectable: true,
+              selected: true,
+            },
+            { title: "n3.2.3" },
+            { title: "n3.2.4 (selected)", selected: true },
+          ],
         },
         {
-          title: "n3.3", expanded: true, children: [
+          title: "n3.4 (radiogroup)",
+          expanded: true,
+          radiogroup: true,
+          checkbox: false,
+          children: [
             {
-              title: "n3.3.1 (unselectableStatus: true, unselectableIgnore)",
-              unselectableStatus: true, unselectableIgnore: true
+              title: "n3.4.1 (unselectable: true)",
+              unselectable: true,
             },
             {
-              title: "n3.3.2 (unselectableStatus: false, unselectableIgnore)",
-              unselectableStatus: false, unselectableIgnore: true
+              title: "n3.4.2 (selected)",
+              selected: true,
             },
-            { title: "n3.3.3" }
-          ]
+            { title: "n3.4.3" },
+          ],
         },
-        {
-          title: "n3.4 (radiogroup)", expanded: true, radiogroup: true, checkbox: false, children: [
-            {
-              title: "n3.4.1 (unselectableStatus: true, unselectableIgnore)",
-              unselectableStatus: true, unselectableIgnore: true
-            },
-            {
-              title: "n3.4.2 (unselectableStatus: false, unselectableIgnore)",
-              unselectableStatus: false, unselectableIgnore: true
-            },
-            { title: "n3.4.3" }
-          ]
-        }
-      ]
-    }
+      ],
+    },
   ],
   debugLevel: 5,
   connectTopBreadcrumb: document.getElementById("parentPath"),
@@ -101,8 +103,6 @@ new mar10.Wunderbaum({
   // },
   init: (e) => {
     // Tree was loaded and rendered. Now set focus:
-    const node = e.tree.findFirst("Jumping dopily")
-    node.setActive()
     e.tree.setFocus();
   },
   lazyLoad: function (e) {

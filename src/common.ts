@@ -53,7 +53,7 @@ export const iconMap = {
   // expanderLazy: "bi bi-chevron-bar-right",
   checkChecked: "bi bi-check-square",
   checkUnchecked: "bi bi-square",
-  checkUnknown: "bi dash-square-dotted",
+  checkUnknown: "bi bi-dash-square-dotted",
   radioChecked: "bi bi-circle-fill",
   radioUnchecked: "bi bi-circle",
   radioUnknown: "bi bi-circle-dotted",
