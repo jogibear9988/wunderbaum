@@ -242,8 +242,16 @@ function reconfigureTree(tag = null) {
 
   detailsElem.classList.remove("error");
   detailsElem.innerHTML = `Loading demo '${tag}'&hellip;`;
+  // Elements that are hidden from the initial welcome page:
   document.querySelectorAll(".hide-on-welcome").forEach((elem) => {
     elem.classList.toggle("hidden", isWelcome);
+  });
+  // Elements that are hidden on every page change (need to explicitly show by demo code):
+  document.querySelectorAll(".hide-on-init").forEach((elem) => {
+    elem.classList.add("hidden");
+  });
+  document.querySelectorAll(".clear-on-init").forEach((elem) => {
+    elem.innerHTML = "";
   });
 
   demoTree?.destroy();

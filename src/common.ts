@@ -56,7 +56,7 @@ export const iconMap = {
   checkUnknown: "bi bi-dash-square-dotted",
   radioChecked: "bi bi-circle-fill",
   radioUnchecked: "bi bi-circle",
-  radioUnknown: "bi bi-circle-dotted",
+  radioUnknown: "bi bi-record-circle",
   folder: "bi bi-folder2",
   folderOpen: "bi bi-folder2-open",
   folderLazy: "bi bi-folder-symlink",

@@ -166,7 +166,7 @@ export interface NodeTypeDefinition {
   // /** Type ID that matches `node.type`. */
   // id: string;
   /** En/disable checkbox for matching nodes. */
-  checkbox?: boolean | BoolOrStringOptionResolver;
+  checkbox?: boolean | "radio" | BoolOrStringOptionResolver;
   /** Optional class names that are added to all `div.wb-row` elements of matching nodes. */
   classes?: string;
   /** Only show title and hide other columns if any. */

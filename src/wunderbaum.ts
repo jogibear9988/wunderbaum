@@ -1054,17 +1054,9 @@ export class Wunderbaum {
   /** Recursively select all nodes. */
   selectAll(flag: boolean = true) {
     return this.root.setSelected(flag);
-    // this.runWithDeferredUpdate(() => {
-    //   this.visit((node) => {
-    //     if (node.parent.radiogroup) {
-    //       return "skip";
-    //     }
-    //     node.setSelected(flag);
-    //   });
-    // });
   }
 
-  /** Recursively select all nodes. */
+  /** Toggle select all nodes. */
   toggleSelect() {
     this.selectAll(this.root._anySelectable());
   }
@@ -1077,12 +1069,11 @@ export class Wunderbaum {
     return this.root.getSelectedNodes(stopOnParents);
   }
 
-  /** Return the number of nodes in the data model.*/
+  /** Return the number of nodes in the data model.
+   * @param visible if true, nodes that are hidden due to collapsed parents are ignored.
+   */
   count(visible = false): number {
-    if (visible) {
-      return this.treeRowCount;
-    }
-    return this.keyMap.size;
+    return visible ? this.treeRowCount : this.keyMap.size;
   }
 
   /** @internal sanity check. */

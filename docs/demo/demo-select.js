@@ -5,14 +5,17 @@
  */
 
 document.getElementById("demo-info").innerHTML = `
-Hierarchical selection demo.<br>
+Hierarchical selection demo (<code>selectMode: 'hier'</code>).<br>
 100k nodes: click <i class="bi bi-plus-slash-minus"></i> to expand them all.
 `;
+
+// document.getElementById("selectMode").classList.remove("hidden");
 
 new mar10.Wunderbaum({
   id: "demo",
   element: document.getElementById("demo-tree"),
   header: "Select Tree",
+  // selectMode: "single",
   selectMode: "hier",
   source: [
     {
@@ -112,6 +115,9 @@ new mar10.Wunderbaum({
     console.log(e.type, e);
   },
   select: function (e) {
-    console.log(e.type, e);
+    console.log(e.type, e, e.tree.getSelectedNodes());
+    document.getElementById(
+      "tree-info-custom"
+    ).textContent = `Selected: ${e.tree.getSelectedNodes(true)}`;
   },
 });

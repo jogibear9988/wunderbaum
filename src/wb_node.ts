@@ -319,13 +319,16 @@ export class WunderbaumNode {
         // insert nodeList after children[pos]
         this.children.splice(pos, 0, ...nodeList);
       }
-      // TODO:
-      // if (tree.options.selectMode === "hier") {
-      //   this.fixSelection3FromEndNodes();
-      // }
       // this.triggerModifyChild("add", nodeList.length === 1 ? nodeList[0] : null);
       tree.update(ChangeType.structure);
     } finally {
+      // if (tree.options.selectMode === "hier") {
+      //   if (this.parent && this.parent.children) {
+      //     this.fixSelection3FromEndNodes();
+      //   } else {
+      //     // my happen when loading __root__;
+      //   }
+      // }
       tree.enableUpdate(true);
     }
     // if(isTopCall && loadLazy){
@@ -1001,6 +1004,9 @@ export class WunderbaumNode {
         tree.data[key] = value;
         tree.logDebug(`Add source.${key} to tree.data.${key}`);
       }
+    }
+    if (tree.options.selectMode === "hier") {
+      this.fixSelection3FromEndNodes();
     }
 
     this._callEvent("load");
@@ -1800,8 +1806,8 @@ export class WunderbaumNode {
         cbclass += "wb-radio ";
         if (this.selected) {
           cbclass += iconMap.radioChecked;
-        } else if (this._partsel) {
-          cbclass += iconMap.radioUnknown;
+          // } else if (this._partsel) {
+          //   cbclass += iconMap.radioUnknown;
         } else {
           cbclass += iconMap.radioUnchecked;
         }
@@ -2190,7 +2196,6 @@ export class WunderbaumNode {
         !node.parent.radiogroup
       ) {
         found = true;
-        this.logInfo("_anySelectable");
         return false; // Stop iteration
       }
     });
@@ -2219,14 +2224,13 @@ export class WunderbaumNode {
       default:
         util.error(`Invalid state: ${state}`);
     }
-    // this.debug("_changeSelectStatusProps()", state, changed);
     if (changed) {
       this.update();
     }
     return changed;
   }
   /**
-   * Fix selection status, after this node was (de)selected in multi-hier mode.
+   * Fix selection status, after this node was (de)selected in `selectMode: 'hier'`.
    * This includes (de)selecting all descendants.
    */
   fixSelection3AfterClick(opts?: SetSelectedOptions): void {
@@ -2252,7 +2256,6 @@ export class WunderbaumNode {
    */
   fixSelection3FromEndNodes(opts?: SetSelectedOptions): void {
     const force = !!opts?.force;
-    // this.debug("fixSelection3FromEndNodes()");
     util.assert(
       this.tree.options.selectMode === "hier",
       "expected selectMode 'hier'"
@@ -2273,21 +2276,16 @@ export class WunderbaumNode {
           const child = children[i];
           // the selection state of a node is not relevant; we need the end-nodes
           const s = _walk(child);
-          const unselIgnore = false; //this.getOption("unselectableIgnore", false);
-          if (!unselIgnore) {
-            if (s !== false) {
-              someSelected = true;
-            }
-            if (s !== true) {
-              allSelected = false;
-            }
+          if (s !== false) {
+            someSelected = true;
+          }
+          if (s !== true) {
+            allSelected = false;
           }
         }
         state = allSelected ? true : someSelected ? undefined : false;
       } else {
         // This is an end-node: simply report the status
-        // unselState = this.getOption("unselectableStatus", undefined);
-        // state = unselState == null ? !!node.selected : !!unselState;
         state = !!node.selected;
       }
       // #939: Keep a `_partsel` flag that was explicitly set on a lazy node
@@ -2315,19 +2313,14 @@ export class WunderbaumNode {
 
       for (let i = 0, l = children.length; i < l; i++) {
         const child = children[i];
-        const unselIgnore = false; //this.getOption("unselectableIgnore", false);
-        if (!unselIgnore) {
-          // unselState = this.getOption("unselectableStatus", undefined);
-          // state = unselState == null ? !!child.selected : !!unselState;
-          state = !!child.selected;
-          // When fixing the parents, we trust the sibling status (i.e.
-          // we don't recurse)
-          if (state || child._partsel) {
-            someSelected = true;
-          }
-          if (!state) {
-            allSelected = false;
-          }
+
+        state = !!child.selected;
+        // When fixing the parents, we trust the sibling status (i.e. we don't recurse)
+        if (state || child._partsel) {
+          someSelected = true;
+        }
+        if (!state) {
+          allSelected = false;
         }
       }
       state = allSelected ? true : someSelected ? undefined : false;
@@ -2348,7 +2341,7 @@ export class WunderbaumNode {
     const canSelect = options?.force || !this.getOption("unselectable");
 
     flag = !!flag;
-    this.logDebug(`setSelected(${flag})`, this);
+    // this.logDebug(`setSelected(${flag})`, this);
     if (!canSelect) {
       return prev;
     }
@@ -2381,6 +2374,10 @@ export class WunderbaumNode {
         this.selected = flag;
         if (selectMode === "hier") {
           this.fixSelection3AfterClick();
+        } else if (selectMode === "single") {
+          tree.visit((n) => {
+            n.selected = false;
+          });
         }
       }
     });
