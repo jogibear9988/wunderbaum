@@ -9,7 +9,6 @@ First release.
 
 - v0.4.0: Add support for hierarchical selection (`selectMode: "hier"`)
 - v0.4.0: Add support for radio-groups
-- v0.4.0: Add support for range selection
 
 - v0.3.6: Remove import of wunderbaum.scss into TS modules
 - v0.3.6: Renamed `setModified()` to `update()`

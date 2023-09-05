@@ -34,6 +34,8 @@ export type NodeToDictCallback = (
   dict: WbNodeData,
   node: WunderbaumNode
 ) => NodeVisitResponse;
+/** A callback that receives a node instance and returns a string value. */
+export type NodeSelectCallback = (node: WunderbaumNode) => boolean | void;
 
 // type WithWildcards<T> = T & { [key: string]: unknown };
 /** A plain object (dictionary) that represents a node instance. */
@@ -248,6 +250,8 @@ export type ColumnEventInfoMap = { [colId: string]: ColumnEventInfo };
  * @see {@link Wunderbaum.getEventInfo}
  */
 export interface WbEventInfo {
+  /** The original HTTP Event.*/
+  event: MouseEvent | KeyboardEvent;
   /** Canonical descriptive string of the event type including modifiers,
    * e.g. `Ctrl+Down`. @see {@link util.eventToString}
    */
@@ -497,16 +501,16 @@ export interface UpdateOptions {
 
 /** Possible values for {@link WunderbaumNode.setSelected()} `options` argument. */
 export interface SetSelectedOptions {
-  /** Ignore restrictions. @default false */
+  /** Ignore restrictions, e.g. (`unselectable`). @default false */
   force?: boolean;
   /** Do not send `beforeSelect` or `select` events. @default false */
   noEvents?: boolean;
-  /** Apply to all descendant nodes. @default false */
-  propagateDown: null;
-  /** Apply to all ancestor nodes. @default false */
-  propagateUp: null;
+  /** Apply to all descendant nodes (only for `selectMode: 'multi'`). @default false */
+  propagateDown?: boolean;
+  // /** Apply to all ancestor nodes. @default false */
+  // propagateUp?: boolean;
   /** Called for every node. May return false to prevent action. @default null */
-  callback: null;
+  callback?: NodeSelectCallback;
 }
 
 /** Possible values for {@link WunderbaumNode.setStatus()} `options` argument. */

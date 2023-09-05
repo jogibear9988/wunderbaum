@@ -135,8 +135,8 @@ export class Wunderbaum {
   public _util = util;
 
   // --- SELECT ---
-  /** @internal */
-  public selectRangeAnchor: WunderbaumNode | null = null;
+  // /** @internal */
+  // public selectRangeAnchor: WunderbaumNode | null = null;
 
   // --- FILTER ---
   public filterMode: FilterModeType = null;
@@ -387,13 +387,11 @@ export class Wunderbaum {
       const node = info.node;
       const mouseEvent = e as MouseEvent;
 
-      // this.log("click", info, e);
-      if (mouseEvent.shiftKey && this.selectRangeAnchor && node) {
-        // this.selec
-        util.error("Not implemented: range selection");
-      } else {
-        this.selectRangeAnchor = node;
-      }
+      // this.log("click", info);
+
+      // if (this._selectRange(info) === false) {
+      //   return;
+      // }
 
       if (
         this._callEvent("click", { event: e, node: node, info: info }) === false
@@ -1053,7 +1051,7 @@ export class Wunderbaum {
 
   /** Recursively select all nodes. */
   selectAll(flag: boolean = true) {
-    return this.root.setSelected(flag);
+    return this.root.setSelected(flag, { propagateDown: true });
   }
 
   /** Toggle select all nodes. */
@@ -1067,6 +1065,44 @@ export class Wunderbaum {
    */
   getSelectedNodes(stopOnParents: boolean = false): WunderbaumNode[] {
     return this.root.getSelectedNodes(stopOnParents);
+  }
+
+  /*
+   * Return an array of selected nodes.
+   */
+  protected _selectRange(eventInfo: WbEventInfo): false | void {
+    this.logDebug("_selectRange", eventInfo);
+    util.error("Not yet implemented.");
+    // const mode = this.options.selectMode!;
+    // if (mode !== "multi") {
+    //   this.logDebug(`Range selection only available for selectMode 'multi'`);
+    //   return;
+    // }
+
+    // if (eventInfo.canonicalName === "Meta+click") {
+    //   eventInfo.node?.toggleSelected();
+    //   return false; // don't
+    // } else if (eventInfo.canonicalName === "Shift+click") {
+    //   let from = this.activeNode;
+    //   let to = eventInfo.node;
+    //   if (!from || !to || from === to) {
+    //     return;
+    //   }
+    //   this.runWithDeferredUpdate(() => {
+    //     this.visitRows(
+    //       (node) => {
+    //         node.setSelected();
+    //       },
+    //       {
+    //         includeHidden: true,
+    //         includeSelf: false,
+    //         start: from,
+    //         reverse: from!._rowIdx! > to!._rowIdx!,
+    //       }
+    //     );
+    //   });
+    //   return false;
+    // }
   }
 
   /** Return the number of nodes in the data model.
@@ -1334,6 +1370,7 @@ export class Wunderbaum {
       node = Wunderbaum.getNode(target),
       tree = node ? node.tree : Wunderbaum.getTree(event),
       res: WbEventInfo = {
+        event: <MouseEvent>event,
         canonicalName: util.eventToString(event),
         tree: tree!,
         node: node,

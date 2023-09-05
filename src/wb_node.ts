@@ -2345,7 +2345,7 @@ export class WunderbaumNode {
     if (!canSelect) {
       return prev;
     }
-    if (options?.propagateDown) {
+    if (options?.propagateDown && selectMode === "multi") {
       tree.runWithDeferredUpdate(() => {
         this.visit((node) => {
           node.setSelected(flag);
